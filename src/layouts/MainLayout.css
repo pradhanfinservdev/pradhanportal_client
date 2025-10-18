@@ -1,0 +1,107 @@
+/* client/src/layouts/Mainlayout.css */
+:root {
+  --sidebar: #22314c;
+  --sidebar-accent: #1a2540;
+  --primary: #3b82f6;
+  --text: #0f172a;
+  --muted: #64748b;
+  --table-head: #2b3f66;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Arial, sans-serif;
+  background: #f6f7fb;
+  color: var(--text);
+}
+
+/* App wrapper */
+.app {
+  display: flex;
+  min-height: 100vh;
+  background: #f6f7fb;
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  padding: 22px 26px;
+  transition: margin-left 0.3s ease;
+}
+
+/* ===== Header ===== */
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 14px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.company-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.company-name h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--sidebar);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Mobile toggle button */
+.toggle-btn-mobile {
+  background: var(--primary);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+/* ===== Desktop Sidebar + Content Alignment ===== */
+@media (min-width: 1024px) {
+  .content {
+    margin-left: 260px; /* matches default sidebar width */
+  }
+  .sidebar.collapsed ~ .content {
+    margin-left: 70px;
+  }
+}
+
+/* ===== Tablet ===== */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .content {
+    margin-left: 200px; /* slightly smaller sidebar */
+  }
+  .sidebar.collapsed ~ .content {
+    margin-left: 70px;
+  }
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 767px) {
+  .content {
+    margin-left: 0; /* sidebar overlays, so content takes full width */
+    padding: 16px;
+  }
+  .company-name h2 {
+    font-size: 18px;
+  }
+}

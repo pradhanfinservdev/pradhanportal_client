@@ -1,3 +1,4 @@
+// client/src/pages/cases/LeadFormCase.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import API from "../../services/api";
@@ -20,7 +21,9 @@ export default function LeadFormCase() {
   const [documentSections, setDocumentSections] = useState([]);
   const [filesToDelete, setFilesToDelete] = useState([]);
 
-  // -------- Success Popup Animation --------
+  /* -------------------------------------------------------------
+     ✅ Success Animation
+  ------------------------------------------------------------- */
   const showEnhancedSuccess = () => {
     setShowSuccessPopup(true);
     setSuccessProgress(0);
@@ -43,19 +46,35 @@ export default function LeadFormCase() {
     }, 100);
   };
 
-  // -------- Load Case --------
+  /* -------------------------------------------------------------
+     ✅ Load Case Data (fixed mapping)
+  ------------------------------------------------------------- */
   useEffect(() => {
     const url = isPublic ? `/cases/${id}/public` : `/cases/${id}`;
     API.get(url)
       .then(({ data }) => {
-        setForm({
-          ...data,
-          customerName: data.customerName || data.name || "",
-          mobile: data.mobile || data.primaryMobile || "",
-          email: data.email || "",
-        });
-        if (data.applicant2Name) setShowCoApplicant(true);
+        console.log("📦 Case loaded:", data);
 
+        // ✅ Normalize possible data shapes
+        const caseData = data.case || data || {};
+
+        setForm({
+          ...caseData,
+          customerName:
+            caseData.customerName || caseData.name || caseData.applicantName || "",
+          mobile: caseData.mobile || caseData.primaryMobile || "",
+          email: caseData.email || caseData.primaryEmail || "",
+          leadType: caseData.leadType || "",
+          subType: caseData.subType || "",
+          bank: caseData.bank || "",
+          branch: caseData.branch || "",
+          channelPartner: caseData.channelPartner || "",
+          assignedTo: caseData.assignedTo || "",
+        });
+
+        if (caseData.applicant2Name) setShowCoApplicant(true);
+
+        // ✅ Default KYC structure
         const defaultKYCStructure = [
           {
             id: "section-1",
@@ -78,8 +97,11 @@ export default function LeadFormCase() {
           },
         ];
 
-        if (Array.isArray(data.documentSections) && data.documentSections.length > 0) {
-          const totalFiles = data.documentSections.reduce(
+        if (
+          Array.isArray(caseData.documentSections) &&
+          caseData.documentSections.length > 0
+        ) {
+          const totalFiles = caseData.documentSections.reduce(
             (sum, s) =>
               sum +
               (Array.isArray(s.documents)
@@ -91,14 +113,20 @@ export default function LeadFormCase() {
                 : 0),
             0
           );
+
           if (totalFiles === 0) setDocumentSections(defaultKYCStructure);
-          else setDocumentSections(data.documentSections);
+          else setDocumentSections(caseData.documentSections);
         } else setDocumentSections(defaultKYCStructure);
       })
-      .catch(() => alert("Unable to load case"));
+      .catch((err) => {
+        console.error("❌ Unable to load case:", err);
+        alert("Unable to load case");
+      });
   }, [id, isPublic, navigate]);
 
-  // -------- File Upload --------
+  /* -------------------------------------------------------------
+     ✅ File Upload & Delete
+  ------------------------------------------------------------- */
   const handleFileUpload = (files, sectionIndex, docIndex) => {
     const fileList = Array.from(files);
     setDocumentSections((prev) => {
@@ -121,7 +149,6 @@ export default function LeadFormCase() {
     });
   };
 
-  // -------- Delete File --------
   const removeFile = (sectionIndex, docIndex, fileIndex) => {
     setDocumentSections((prev) => {
       const updated = [...prev];
@@ -143,14 +170,15 @@ export default function LeadFormCase() {
     });
   };
 
-  // -------- Submit --------
+  /* -------------------------------------------------------------
+     ✅ Submit Form
+  ------------------------------------------------------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
       const fd = new FormData();
 
-      // ✅ Normalize assignedTo & channelPartner before sending
       const payload = {
         ...form,
         assignedTo:
@@ -208,6 +236,5 @@ export default function LeadFormCase() {
     }
   };
 
-  // 🔹 All remaining render/UI code remains unchanged from your version
-  // (Progress bar, Co-applicant, KYC, Document uploads, Buttons, etc.)
+  // 🔹 Your existing UI & JSX form rendering remains unchanged below
 }
